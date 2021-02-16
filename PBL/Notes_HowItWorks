@@ -1,0 +1,127 @@
+About dataset:
+
+ We have collected data about a set of patients, all of whom suffered from the same illness. During their course of treatment, each patient responded to one of 5 medications, Drug A, Drug B, Drug c, Drug x and y.
+
+GOAL:
+
+ Build a model to find out which drug might be appropriate for a future patient with the same illness. The feature sets of this dataset are Age, Sex, Blood Pressure, and Cholesterol of patients, and the target is the drug that each patient responded to.
+
+####################################################################################################################################
+##########################                                    Code With comments                          ##########################
+####################################################################################################################################
+
+
+####################################################################################################################################
+##########################             Import all the Libraries which we are going to use.                ##########################
+####################################################################################################################################
+
+Libraries Definition:
+NumPy is a library for the Python programming language, adding support for large, multi-dimensional arrays and matrices, along with a large collection of high-level mathematical functions to operate on these arrays
+Pandas is a software library written for the Python programming language for data manipulation and analysis.
+Scikit-learn is a free software machine learning library for the Python programming language. It features various classification, regression and clustering algorithms including support vector machines
+Matplotlib is a plotting library for the Python programming language and its numerical mathematics extension NumPy. It provides an object-oriented API for embedding plots into applications using general-purpose GUI toolkits like Tkinter, wxPython, Qt, or GTK+.
+
+
+
+import numpy as np 
+import pandas as pd
+from sklearn.tree import DecisionTreeClassifier
+from sklearn import metrics
+import matplotlib.pyplot as plt
+
+
+###########################################  Loading Data ############################################################
+
+# Read_csv is used to read Csv file using panadas library 
+# using r because it help us to get file from relative path of the folder
+
+my_data=pd.read_csv(r"C:\Users\anupk\OneDrive\Desktop\Drug_ML_project\Project\drug200.csv")
+my_data[0:5]
+
+
+###########################################  Size of the data ############################################################
+
+#Shape help us to get the data size
+
+my_data.shape
+
+###########################################  Pre-processing ############################################################
+
+X=my_data[["Age","Sex","BP","Cholesterol","Na_to_K"]].values
+X[0:5]
+
+# We have catigorical variables in our features like "Sex" and "BP" Unfortunately,Sklearn Decision tree don't handle with catigorical variables so we have to convert them into numerical variables.
+
+from sklearn import preprocessing
+le_sex = preprocessing.LabelEncoder()
+le_sex.fit(['F','M'])
+X[:,1] = le_sex.transform(X[:,1]) 
+
+
+le_BP = preprocessing.LabelEncoder()
+le_BP.fit([ 'LOW', 'NORMAL', 'HIGH'])
+X[:,2] = le_BP.transform(X[:,2])
+
+
+le_Chol = preprocessing.LabelEncoder()
+le_Chol.fit([ 'LOW', 'HIGH'])
+X[:,3] = le_Chol.transform(X[:,3]) 
+
+X
+
+###########################################  Target Variable ############################################################
+#
+y=my_data["Drug"]
+y[0:5]
+
+###########################################  Setting up the Decision Tree ############################################################
+#We will be using train/test split on our decision tree.
+
+from sklearn.model_selection import train_test_split
+X_trainset, X_testset, y_trainset, y_testset = train_test_split(X, y, test_size=0.3, random_state=3)
+print("Shape of X_trainset: ",X_trainset.shape)
+print("Shape of y_trainset: ",y_trainset.shape)
+
+print("Shape of X_testset: ",X_testset.shape)
+print("Shape of y_testset: ",y_testset.shape)
+
+
+###########################################  Modeling ############################################################
+#We will first create an instance of the DecisionTreeClassifier called drugTree.
+
+About 
+
+In computer science, Decision tree learning uses a decision tree (as a predictive model) to go from observations about an item (represented in the branches) to conclusions about the item's target value (represented in the leaves). It is one of the predictive modeling approaches used in statistics, data mining and machine learning. Tree models where the target variable can take a discrete set of values are called classification trees; in these tree structures, leaves represent class labels and branches represent conjunctions of features that lead to those class labels. Decision trees where the target variable can take continuous values (typically real numbers) are called regression trees.
+
+
+drugTree = DecisionTreeClassifier(criterion="entropy", max_depth = 4)
+drugTree # it shows the default parameters
+
+
+#We will fit the data with the training feature matrix X_trainset and training response vector y_trainset
+drugTree.fit(X_trainset,y_trainset)
+
+
+
+###########################################  Prediction ############################################################
+
+#  make some predictions on the testing dataset and store it into a variable called predTree.
+
+predTree=drugTree.predict(X_testset)
+
+print("Predictions : ",predTree[0:5])
+print("Actual Values : \n",y_testset[0:5])
+
+
+###########################################  EVALUATION ############################################################
+
+print("DecisionTrees's Accuracy: ", metrics.accuracy_score(y_testset, predTree))
+
+
+predTree=drugTree.predict([[12, 1, 0, 0, 35.5]])
+predTree
+
+# Data need to be enter here Age,Sex,BP,Cholesterol,Na_to_K
+predTree[0]
+ 
+
